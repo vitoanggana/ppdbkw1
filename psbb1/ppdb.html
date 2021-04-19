@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPDB CRUD1</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+    <a href="daftar.html">MENUJU HALAMAN DAFTAR</a>
+    <br><br>
+    <h1>ADMIN</h1>
+    Nomer Registrasi : <input id="noregTbox" type="text" oninput="Update(this.value,'noreg')"> <br><br>
+    Nama : <input id="namaTbox" type="text" oninput="Update(this.value,'nama')"> <br><br>
+    Jenis Kelamin : <input id="jkTbox" type="text" oninput="Update(this.value,'jk')"> <br><br>
+    Alamat : <input id="alamatTbox" type="text" oninput="Update(this.value,'alamat')"> <br><br>
+    Agama: <input id="agamaTbox" type="text" oninput="Update(this.value,'agama')"> <br><br>
+    Asal Sekolah : <input id="sekolahTbox" type="text" oninput="Update(this.value,'sekolah')"> <br><br>
+    Minat Jurusan : <input id="minatjurusanTbox" type="text" oninput="Update(this.value,'jurusan')"> <br><br>
+    <hr>
+    <button id="insertBtn">ADD DATA</button>
+    <button id="selectBtn">SELECT</button>
+    <button id="updateBtn">UPDATE</button>
+    <button id="deleteBtn">DELETE</button>
+    <hr>
+    <!-- <ul id='list'>
+
+    </ul> -->
+
+    <table id="tabelmurid" class="table">
+        <thead>
+            <th>No Reg</th>
+            <th>Nama</th>
+            <th>Jenis Kelamin</th>
+            <th>Alamat</th>
+            <th>Agama</th>
+            <th>Asal Sekolah</th>
+            <th>Minat Jurusan</th>
+        </thead>
+        <tbody>
+
+        </tbody>
+
+    </table>
+    <hr>
+    <br><br>
+    <button id="export" onclick="doit('xlsx');">EXPORT TO EXCEL</button>
+
+
+
+    <!--Firestore Libraries-->
+    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.16.9/dist/xlsx.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+
+    <script id="mainScript">
+
+        //Configuration//
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBE04fYEMcyNtDdetWTMDw1GDyra-EqbFY",
+            authDomain: "ppdb1-82c2c.firebaseapp.com",
+            projectId: "ppdb1-82c2c",
+            storageBucket: "ppdb1-82c2c.appspot.com",
+            messagingSenderId: "675767947170",
+            appId: "1:675767947170:web:8cb11c3556930065952cfb"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        let cloudDB = firebase.firestore();
+
+        //var//
+
+        let noregT = document.getElementById('noregTbox');
+        let namaT = document.getElementById('namaTbox');
+        let jkT = document.getElementById('jkTbox');
+        let alamatT = document.getElementById('alamatTbox');
+        let agamaT = document.getElementById('agamaTbox');
+        let sekolahT = document.getElementById('sekolahTbox');
+        let jurusanT = document.getElementById('minatjurusanTbox');
+
+        let noregV = noregT.value;
+        let namaV = namaTbox.value;
+        let jkV = jkTbox.value;
+        let alamatV = alamatTbox.value;
+        let agamaV = agamaTbox.value;
+        let sekolahV = sekolahTbox.value;
+        let jurusanV = minatjurusanTbox.value;
+
+        function Update(val, type) {
+            if (type == 'noreg') noregV = val;
+            else if (type == 'nama') namaV = val;
+            else if (type == 'jk') jkV = val;
+            else if (type == 'alamat') alamatV = val;
+            else if (type == 'agama') agamaV = val;
+            else if (type == 'sekolah') sekolahV = val;
+            else if (type == 'jurusan') jurusanV = val;
+        }
+
+
+        //get all data//
+
+        function SelectAllData() {
+            firebase.firestore().collection('muridBaru').get().then(snap => {
+                snap.docs.forEach(doc => {
+                    const noreg = doc.data().noReg;
+                    const nama = doc.data().namaMurid;
+                    const jk = doc.data().jkMurid;
+                    const alamat = doc.data().alamatMurid;
+                    const agama = doc.data().agamaMurid;
+                    const sekolah = doc.data().asalSekolah;
+                    const jurusan = doc.data().jurusanMurid;
+
+                    AddItemsToTable(noreg, nama, jk, alamat, agama, sekolah, jurusan);
+
+                })
+            })
+        }
+
+        window.onload = SelectAllData;
+
+        //filling the table//
+
+        function AddItemsToTable(noreg, nama, jk, alamat, agama, sekolah, jurusan) {
+            var tbody = document.querySelector('#tabelmurid tbody');
+            var trow = document.createElement('tr');
+            var td1 = document.createElement('td');
+            var td2 = document.createElement('td');
+            var td3 = document.createElement('td');
+            var td4 = document.createElement('td');
+            var td5 = document.createElement('td');
+            var td6 = document.createElement('td');
+            var td7 = document.createElement('td');
+
+            td1.innerHTML = noreg;
+            td2.innerHTML = nama;
+            td3.innerHTML = jk;
+            td4.innerHTML = alamat;
+            td5.innerHTML = agama;
+            td6.innerHTML = sekolah;
+            td7.innerHTML = jurusan;
+
+            trow.appendChild(td1);
+            trow.appendChild(td2);
+            trow.appendChild(td3);
+            trow.appendChild(td4);
+            trow.appendChild(td5);
+            trow.appendChild(td6);
+            trow.appendChild(td7);
+
+            tbody.appendChild(trow)
+        }
+
+        //Add data with auto ID//
+
+        function Add_Doc_WithAutoID() {
+            cloudDB.collection("muridBaru").add(
+                {
+                    noReg: Number(noregV),
+                    namaMurid: namaV,
+                    jkMurid: jkV,
+                    alamatMurid: alamatV,
+                    agamaMurid: agamaV,
+                    asalSekolah: sekolahV,
+                    jurusanMurid: jurusanV
+
+                }
+            )
+                .then(function (docRef) {
+                    alert("Selamat, Anda sudah terdaftar di SMK Merdeka Belajar");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    alert("Error adding document");
+                })
+        }
+
+        //Add data with custom ID//
+
+        function Add_Doc_WithID() {
+            cloudDB.collection("muridBaru").doc(noregV).set(
+                {
+                    noReg: Number(noregV),
+                    namaMurid: namaV,
+                    jkMurid: jkV,
+                    alamatMurid: alamatV,
+                    agamaMurid: agamaV,
+                    asalSekolah: sekolahV,
+                    jurusanMurid: jurusanV
+
+                }
+            )
+                .then(function () {
+                    alert("Berhasil menambahkan data");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    alert("Error adding document");
+                })
+        }
+
+        //Update Data//
+
+        function Update_Fields_inDocument() {
+            cloudDB.collection("muridBaru").doc(noregV).update(
+                {
+                    namaMurid: namaTbox.value,
+                    jkMurid: jkTbox.value,
+                    alamatMurid: alamatTbox.value,
+                    agamaMurid: agamaTbox.value,
+                    asalSekolah: sekolahTbox.value,
+                    jurusanMurid: minatjurusanTbox.value
+
+                }
+            )
+                .then(function () {
+                    alert("Data berhasil diubah!");
+                })
+                .catch(function (error) {
+                    alert("Error updating document");
+                })
+        }
+
+        //Delete Data//
+
+        function DeleteDocument() {
+            cloudDB.collection("muridBaru").doc(noregV).delete(
+
+            )
+                .then(function () {
+                    alert("Berhasil Menghapus Data");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    alert("Error deleting document");
+                })
+        }
+
+        //Retrieve Data//
+
+        function RetrieveData_inDocument() {
+            cloudDB.collection("muridBaru").doc(noregV).get()
+                .then(function (doc) {
+                    if (doc.exists) {
+
+                        namaT.value = doc.data().namaMurid;
+                        jkT.value = doc.data().jkMurid;
+                        alamatT.value = doc.data().alamatMurid;
+                        agamaT.value = doc.data().agamaMurid;
+                        sekolahT.value = doc.data().asalSekolah;
+                        jurusanT.value = doc.data().jurusanMurid;
+                    }
+                    else {
+                        alert("doc does not exist");
+                    }
+
+                })
+                .then(function () {
+                    alert("Berhasil mendapatkan data dengan Nomer Registrasi " + noregTbox.value);
+                })
+                .catch(function (error) {
+                    alert("Error ");
+                })
+
+
+        }
+
+        //doit
+        function doit(type, fn, dl) {
+            var elt = document.getElementById('tabelmurid');
+            var wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+            return dl ?
+                XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+                XLSX.writeFile(wb, fn || ('Data Siswa.' + (type || 'xlsx')));
+        }
+
+
+        //Button Events//
+
+        document.getElementById('insertBtn').onclick = function () {
+            Add_Doc_WithID();
+        }
+
+        document.getElementById('selectBtn').onclick = function () {
+            RetrieveData_inDocument();
+        }
+
+        document.getElementById('updateBtn').onclick = function () {
+            Update_Fields_inDocument();
+        }
+
+        document.getElementById('deleteBtn').onclick = function () {
+            DeleteDocument();
+        }
+
+    </script>
+
+</body>
+
+</html>

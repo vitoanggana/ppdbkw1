@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAFTAR MURID BARU</title>
+</head>
+
+<body>
+    <a href="ppdb.html">MENUJU HALAMAN ADMIN</a>
+    <br><br>
+    <h1>DAFTAR SISWA BARU</h1>
+    Nomer Registrasi : <input id="noregTbox" type="text" oninput="Update(this.value,'noreg')"> <br><br>
+    Nama : <input id="namaTbox" type="text" oninput="Update(this.value,'nama')"> <br><br>
+    Jenis Kelamin : <input id="jkTbox" type="text" oninput="Update(this.value,'jk')"> <br><br>
+    Alamat : <input id="alamatTbox" type="text" oninput="Update(this.value,'alamat')"> <br><br>
+    Agama: <input id="agamaTbox" type="text" oninput="Update(this.value,'agama')"> <br><br>
+    Asal Sekolah : <input id="sekolahTbox" type="text" oninput="Update(this.value,'sekolah')"> <br><br>
+    Minat Jurusan : <input id="minatjurusanTbox" type="text" oninput="Update(this.value,'jurusan')"> <br><br>
+    <hr>
+    <button id="insertBtn">DAFTAR</button>
+    <hr>
+
+    <!--Firestore Libraries-->
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+
+    <script id="mainScript">
+
+        //Configuration//
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBE04fYEMcyNtDdetWTMDw1GDyra-EqbFY",
+            authDomain: "ppdb1-82c2c.firebaseapp.com",
+            projectId: "ppdb1-82c2c",
+            storageBucket: "ppdb1-82c2c.appspot.com",
+            messagingSenderId: "675767947170",
+            appId: "1:675767947170:web:8cb11c3556930065952cfb"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        let cloudDB = firebase.firestore();
+
+        //var//
+
+        let noregT = document.getElementById('noregTbox');
+        let namaT = document.getElementById('namaTbox');
+        let jkT = document.getElementById('jkTbox');
+        let alamatT = document.getElementById('alamatTbox');
+        let agamaT = document.getElementById('agamaTbox');
+        let sekolahT = document.getElementById('sekolahTbox');
+        let jurusanT = document.getElementById('minatjurusanTbox');
+
+        let noregV = noregT.value;
+        let namaV = namaTbox.value;
+        let jkV = jkTbox.value;
+        let alamatV = alamatTbox.value;
+        let agamaV = agamaTbox.value;
+        let sekolahV = sekolahTbox.value;
+        let jurusanV = minatjurusanTbox.value;
+
+        function Update(val, type) {
+            if (type == 'noreg') noregV = val;
+            else if (type == 'nama') namaV = val;
+            else if (type == 'jk') jkV = val;
+            else if (type == 'alamat') alamatV = val;
+            else if (type == 'agama') agamaV = val;
+            else if (type == 'sekolah') sekolahV = val;
+            else if (type == 'jurusan') jurusanV = val;
+        }
+
+        //Add data with custom ID//
+
+        function Add_Doc_WithID() {
+            cloudDB.collection("muridBaru").doc(noregV).set(
+                {
+                    noReg: Number(noregV),
+                    namaMurid: namaV,
+                    jkMurid: jkV,
+                    alamatMurid: alamatV,
+                    agamaMurid: agamaV,
+                    asalSekolah: sekolahV,
+                    jurusanMurid: jurusanV
+
+                }
+            )
+                .then(function () {
+                    alert("Selamat, Anda sudah terdaftar di SMK Merdeka Belajar");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    alert("Error adding document");
+                })
+        }
+
+
+        //Button Events//
+
+        document.getElementById('insertBtn').onclick = function () {
+            Add_Doc_WithID();
+        }
+
+    </script>
+
+</body>
+
+</html>
